@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import { AccountService } from 'src/business/services';
 import { AccountEntity, AccountTypeEntity } from 'src/data';
-import { ChangeAccountTypeDto, CreateAccountDto } from 'src/data/dtos';
+import { ChangeAccountTypeDto, CreateAccountDto } from 'src/business/dtos';
 
 @Controller('account')
 export class AccountController {
@@ -12,7 +12,7 @@ export class AccountController {
         return this.accountService.createAccount(createAccount)
     }
 
-    @Post("getbalance")
+    @Get("getbalance")
     getBalance(@Body() accountId: string): number {
         return this.accountService.getBalance(accountId)
     }

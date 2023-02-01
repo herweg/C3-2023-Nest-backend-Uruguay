@@ -1,19 +1,21 @@
 // Libraries
 import { Injectable } from '@nestjs/common';
 import { InternalServerErrorException } from '@nestjs/common/exceptions';
-import { ChangeAccountTypeDto, CreateAccountDto } from 'src/data/dtos';
+import { ChangeAccountTypeDto, CreateAccountDto } from 'src/business/dtos';
 
 // Repositories & Entities
-import { AccountEntity, AccountRepository, AccountTypeEntity, AccountTypeRepository } from 'src/data';
+import { AccountEntity, AccountRepository, AccountTypeEntity, AccountTypeRepository, CustomerRepository } from 'src/data';
+
 
 
 @Injectable()
 export class AccountService {
   constructor(private readonly accountRepository: AccountRepository,
-    private readonly accountTypeRepository: AccountTypeRepository) { }
+    private readonly accountTypeRepository: AccountTypeRepository,
+    private readonly customerRepository: CustomerRepository) { }
 
 
-  getId(id: string):AccountEntity{
+  getId(id: string): AccountEntity {
     const account = this.accountRepository.findOneById(id)
     return account
   }
@@ -26,9 +28,9 @@ export class AccountService {
    */
   createAccount(account: CreateAccountDto): AccountEntity {
     const newAccount = new AccountEntity();
-    const newAccountType = new AccountTypeEntity()
-    newAccountType.id = account.accountTypeId
-    newAccount.accountType = newAccountType;
+    newAccount.accountType = account.accountTypeId;
+    newAccount.customer = account.customerId
+    this.customerRepository.register(newAccount.customer)
     return this.accountRepository.register(newAccount);
   }
 
