@@ -2,12 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { TransferEntity, TransferRepository } from 'src/data';
 import { DataRangeDto, PaginationDto, TransferDto } from 'src/business/dtos';
 import { AccountService } from '../account';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class TransferService {
   constructor(private readonly trasnferRepository: TransferRepository,
     private readonly accountService: AccountService) { }
 
+  //Instance of subject
+  private transferSubject = new Subject<TransferEntity>();
+
+  //Create observable
+  get transferObservable() {
+    return this.transferSubject.asObservable();
+  }
   /**
    * Crear una transferencia entre cuentas del banco
    *
@@ -25,7 +33,11 @@ export class TransferService {
       newTransfer.outcome = newOutcome
       newTransfer.reason = transfer.reason
       newTransfer.dateTime = Date.now()
-      return this.trasnferRepository.register(newTransfer)
+      this.trasnferRepository.register(newTransfer)
+      //Feed the Deposit (observer) to the Observable
+      this.transferSubject.next(newTransfer)
+      
+      return newTransfer
     } catch (error) {
       throw new Error("Error en createTransfer" + error)
     }
