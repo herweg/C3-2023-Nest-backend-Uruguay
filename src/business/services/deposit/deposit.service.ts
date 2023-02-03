@@ -75,9 +75,11 @@ export class DepositService {
     pagination?: PaginationModel,
     dataRange?: DataRangeModel,
   ): DepositEntity[] {
-    
-    if (!dataRange?.max || !dataRange.min) throw new Error("Error en getHistory")
-    const depositArrayByDate = this.depositRepository.findByDataRange(dataRange?.min, dataRange?.max)
+    dataRange = {
+      ... { min: 0, max: Date.now() },
+      ...dataRange,
+    }
+    const depositArrayByDate = this.depositRepository.findByDataRange(dataRange?.min, dataRange?.max, pagination)
     return depositArrayByDate.filter(id => id.id === depositId)
   }
 }

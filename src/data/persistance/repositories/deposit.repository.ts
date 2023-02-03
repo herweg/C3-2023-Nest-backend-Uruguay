@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { DepositEntity } from "../entities";
 import { BaseRepository } from "./base";
 import { DepositRepositoryInterface } from "./interfaces";
+import { PaginationModel } from '../../../../dist/data/models/pagination.model';
 
 @Injectable()
 export class DepositRepository
@@ -76,6 +77,7 @@ export class DepositRepository
     findByDataRange(
         dateInit: Date | number,
         dateEnd: Date | number,
+        paginator?: PaginationModel
     ): DepositEntity[] {
         const currentEntity = this.database.filter(
             (deposit) =>
@@ -84,6 +86,6 @@ export class DepositRepository
                 && typeof deposit.deletedAt === "undefined"
         )
         if (!currentEntity) throw new NotFoundException()
-        else return currentEntity
+        else return currentEntity.slice(Number(paginator?.offset), Number(paginator?.limit))
     }
 }

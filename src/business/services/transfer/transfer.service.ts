@@ -121,7 +121,7 @@ export class TransferService {
     }
   }
 
-  getAll(pagination: PaginationModel): TransferEntity[] {
+  getAll(): TransferEntity[] {
     return this.transferRepository.getAll();
   }
 
