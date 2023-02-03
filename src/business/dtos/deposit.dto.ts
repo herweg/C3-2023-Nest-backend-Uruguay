@@ -1,8 +1,10 @@
+import { IsString } from "@nestjs/class-validator"
 import { IsNumber, IsPositive, IsUUID } from "class-validator"
 
 export class DepositDto {
 
-    @IsUUID(4, { message: "This must be UUID" })
+    //@IsUUID(4, { message: "This must be UUID" })
+    @IsString()
     id: string
 
     @IsNumber()

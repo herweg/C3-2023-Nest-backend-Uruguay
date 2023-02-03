@@ -27,8 +27,12 @@ export class AccountRepository
         return this.database[indexCurrentEntity]
     }
 
-    updateBalance(id: string, balance: number): void {
-        this.findOneById(id).balance += balance
+    updateBalance(id: string, amount: number): number {
+        const account = this.findOneById(id);
+        if (!account || typeof account.balance !== 'number')
+            throw new Error(`Error updating balance for account with id "${id}"`)
+        account.balance += amount
+        return account.balance
     }
 
     delete(id: string, soft?: boolean): void {
@@ -39,15 +43,15 @@ export class AccountRepository
         soft ? this.softDelete(indexToDelete) : this.hardDelete(indexToDelete)
     }
 
-    private hardDelete(index: number): void {
-        if (index > -1) {
-            this.database.splice(index, 1)
-        }
-    }
-
     private softDelete(index: number): void {
         if (index > -1) {
             this.database.find(index => index.deletedAt = new Date)
+        }
+    }
+
+    private hardDelete(index: number): void {
+        if (index > -1) {
+            this.database.splice(index, 1)
         }
     }
 

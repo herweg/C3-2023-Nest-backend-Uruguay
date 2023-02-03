@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Logger, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { DepositService } from 'src/business/services';
 import { DepositEntity } from 'src/data';
-import { DepositDto } from 'src/business/dtos';
+import { DataRangeDto, DepositDto } from 'src/business/dtos';
+import { PaginationModel } from 'src/data/models';
 
 @Controller('deposit')
 export class DepositController {
@@ -23,7 +24,11 @@ export class DepositController {
     }
 
     @Get("history/:id")
-    getHistory(@Param("id") depositId: string) {
-        return this.depositService.getHistory(depositId)
+    getHistory(@Param("id") depositId: string,
+        @Query("offset", ParseIntPipe) offset?: number,
+        @Query("limit", ParseIntPipe) limit?: number,
+        @Body() dataRange?: DataRangeDto) {
+        const pagination: PaginationModel = { offset: offset, limit: limit }
+        return this.depositService.getHistory(depositId, pagination, dataRange)
     }
 }

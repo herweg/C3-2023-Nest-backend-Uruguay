@@ -40,7 +40,7 @@ export class AccountTypeRepository
     findOneById(id: string): AccountTypeEntity {
         const currentEntity = this.database.findIndex(
             (item) => item.id === id)
-        if (!currentEntity) throw new NotFoundException()
+        if (currentEntity == -1) throw new NotFoundException()
         else return this.database[currentEntity]
     }
 

@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Patch, Post, Delete, Param, Logger } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Delete, Param, Logger, Query } from '@nestjs/common';
 import { TransferService } from 'src/business/services';
 import { TransferEntity } from 'src/data';
 import { DataRangeDto, PaginationDto, TransferDto } from 'src/business/dtos';
 import { PaginationModel } from 'src/data/models';
+import { ParseIntPipe } from '@nestjs/common/pipes';
 
 @Controller('transfer')
 export class TransferController {
@@ -23,27 +24,30 @@ export class TransferController {
         return this.transferService.getAll(paginator)
     }
 
-    @Get("historyout")
-    getHistoryOut(@Body()
-    accountId: string,
-        pagination?: PaginationDto,
-        dataRange?: DataRangeDto): TransferEntity[] {
+    @Get("historyout/:id")
+    getHistoryOut(@Param("id") accountId: string,
+        @Query("offset", ParseIntPipe) offset?: number, 
+        @Query("limit", ParseIntPipe) limit?: number,
+        @Body() dataRange?: DataRangeDto): TransferEntity[] {
+        const pagination: PaginationModel = { offset: offset, limit: limit }
         return this.transferService.getHistoryOut(accountId, pagination, dataRange)
     }
 
-    @Get("historyin")
-    getHistoryIn(@Body()
-    accountId: string,
-        pagination?: PaginationDto,
-        dataRange?: DataRangeDto): TransferEntity[] {
+    @Get("historyin/:id")
+    getHistoryIn(@Param("id") accountId: string,
+        @Query("offset", ParseIntPipe) offset?: number, 
+        @Query("limit", ParseIntPipe) limit?: number,
+        @Body() dataRange?: DataRangeDto): TransferEntity[] {
+        const pagination: PaginationModel = { offset: offset, limit: limit }
         return this.transferService.getHistoryIn(accountId, pagination, dataRange)
     }
 
     @Get("history/:id")
-    getHistory(@Param("id")
-    accountId: string,
-        pagination?: PaginationDto,
+    getHistory(@Param("id") accountId: string,
+        @Query("offset", ParseIntPipe) offset?: number, 
+        @Query("limit", ParseIntPipe) limit?: number,
         @Body() dataRange?: DataRangeDto): TransferEntity[] {
+        const pagination: PaginationModel = { offset: offset, limit: limit }
         return this.transferService.getHistory(accountId, pagination, dataRange)
     }
 

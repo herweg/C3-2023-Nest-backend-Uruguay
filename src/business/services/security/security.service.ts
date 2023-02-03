@@ -50,34 +50,30 @@ export class SecurityService {
    * @memberof SecurityService
    */
   signUp(user: SignUpDto): string {
-    const documentType = new DocumentTypeEntity()
-    documentType.name = user.documentTypeName
 
-    const newCustomer = new CustomerEntity();
-    newCustomer.documentType = documentType;
-    newCustomer.document = user.document;
-    newCustomer.fullName = user.fullName;
-    newCustomer.email = user.email;
-    newCustomer.phone = user.phone;
-    newCustomer.password = user.password;
+    const newCustomer = new CustomerEntity()
+    newCustomer.documentType = this.accountService.getDocumentType(user.documentTypeId)
+    newCustomer.document = user.document
+    newCustomer.fullName = user.fullName
+    newCustomer.email = user.email
+    newCustomer.phone = user.phone
+    newCustomer.password = user.password
 
+    //this.documentTypeRepo.register(newCustomer.documentType)
     const customer = this.customerRepository.register(newCustomer)
-    this.documentTypeRepo.register(documentType)
 
     if (customer === undefined)
       throw new InternalServerErrorException() // ERRORRRRRRRRRRRRRRRR
 
-    //Definiendo una Account Type
-    const accountType = new AccountTypeEntity()
     //Definiendo la nueva Account
     const accountEnt = new AccountEntity()
     accountEnt.customer = customer
-    accountEnt.accountType = accountType
-    accountType.name = user.accountTypeName
+    const acctype = this.accountService.getAccountType(user.accountTypeId)
+    accountEnt.accountType = acctype
 
     const newAccount = new CreateAccountDto()
-    newAccount.accountType = accountType
-    newAccount.customer = customer
+    newAccount.accountTypeId = accountEnt.accountType.id
+    newAccount.customerId = customer.id
 
     const account = this.accountService.createAccount(newAccount)
 
@@ -93,6 +89,6 @@ export class SecurityService {
    */
   signOut(JWToken: string): void {
     if (!jwt.verify(JWToken, process.env.TOKEN_SECRET || 'tokentest')) throw new Error('JWT Not Valid')
-    console.log('SignOut Completed')
+    console.log('Signout Completed')
   }
 }

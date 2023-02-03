@@ -75,13 +75,32 @@ export class TransferRepository
     ): TransferEntity[] {
         const currentEntity = this.database.filter(
             (item) =>
-                item.id === accountId
-                && dateInit >= item.dateTime
+                item.outcome.id === accountId
+                && dateInit <= item.dateTime
                 && item.dateTime <= dateEnd
                 && typeof item.deletedAt === "undefined"
         )
         if (!currentEntity) throw new NotFoundException()
-        else return currentEntity.filter(item => item.outcome.id === accountId).slice(paginator?.offset, paginator?.limit)
+        else return currentEntity.slice(Number(paginator?.offset), Number(paginator?.limit))
+    }
+
+
+    findByDataRange(
+        accountId: string,
+        dateInit: Date | number,
+        dateEnd: Date | number,
+        paginator?: PaginationModel,
+    ): TransferEntity[] {
+        const currentEntity = this.database.filter(item =>
+            (item.outcome.id === accountId || item.income.id === accountId)
+            && dateInit <= item.dateTime
+            && item.dateTime <= dateEnd
+            && typeof item.deletedAt === "undefined"
+        )
+        console.log(currentEntity)
+
+        if (!currentEntity) throw new NotFoundException()
+        else return currentEntity.slice(Number(paginator?.offset), Number(paginator?.limit))
     }
 
     findIncomeByDataRange(
@@ -91,12 +110,12 @@ export class TransferRepository
         paginator?: PaginationModel,
     ): TransferEntity[] {
         const currentEntity = this.database.filter(
-            (item) => item.id === accountId
-                && dateInit > item.dateTime
+            (item) => item.income.id === accountId
+                && dateInit < item.dateTime
                 && item.dateTime < dateEnd
                 && typeof item.deletedAt === "undefined"
         )
         if (!currentEntity) throw new NotFoundException()
-        else return currentEntity.filter(item => item.income.id === accountId).slice(paginator?.offset, paginator?.limit)
+        else return currentEntity.slice(Number(paginator?.offset), Number(paginator?.limit))
     }
 }

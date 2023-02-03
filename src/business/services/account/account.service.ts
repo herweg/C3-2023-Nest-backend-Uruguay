@@ -4,8 +4,10 @@ import { InternalServerErrorException } from '@nestjs/common/exceptions';
 import { ChangeAccountTypeDto, CreateAccountDto } from 'src/business/dtos';
 
 // Repositories & Entities
-import { AccountEntity, AccountRepository, AccountTypeEntity, AccountTypeRepository, CustomerRepository } from 'src/data';
+import { AccountEntity, AccountRepository, AccountTypeEntity, AccountTypeRepository, CustomerEntity, CustomerRepository } from 'src/data';
 import { TypeDto } from '../../dtos/type.dto';
+import { DocumentTypeEntity } from '../../../data/persistance/entities/document-type.entity';
+import { DocumentTypeRepository } from '../../../data/persistance/repositories/document-type.repository';
 
 
 
@@ -13,7 +15,8 @@ import { TypeDto } from '../../dtos/type.dto';
 export class AccountService {
 
   constructor(private readonly accountRepository: AccountRepository,
-    private readonly accountTypeRepository: AccountTypeRepository,) { }
+    private readonly accountTypeRepository: AccountTypeRepository,
+    private readonly documentTypeRepository: DocumentTypeRepository) { }
 
 
   getId(id: string): AccountEntity {
@@ -29,15 +32,28 @@ export class AccountService {
    */
   createAccount(account: CreateAccountDto): AccountEntity {
     const newAccount = new AccountEntity()
-    newAccount.accountType = account.accountType
-    newAccount.customer = account.customer
-    return this.accountRepository.register(newAccount)
+
+    const accountType = new AccountTypeEntity();
+    accountType.id = account.accountTypeId;
+    newAccount.accountType = accountType;
+
+    const customer = new CustomerEntity();
+    customer.id = account.customerId;
+    newAccount.customer = customer;
+
+    return this.accountRepository.register(newAccount);
   }
 
-  createAccountType(accountTypeDto: TypeDto): AccountTypeEntity {
+  createAccountType(inputName: TypeDto): AccountTypeEntity {
     const newAccountType = new AccountTypeEntity()
-    newAccountType.name = accountTypeDto.name
+    newAccountType.name = inputName.name
     return this.accountTypeRepository.register(newAccountType)
+  }
+
+  createDocumentType(inputName: TypeDto): DocumentTypeEntity {
+    const newDocumentType = new DocumentTypeEntity()
+    newDocumentType.name = inputName.name
+    return this.documentTypeRepository.register(newDocumentType)
   }
 
   /**
@@ -60,13 +76,14 @@ export class AccountService {
    */
   addBalance(accountId: string, amount: number): number {
     try {
-      const account = this.getId(accountId)
       if (amount > 0) {
-        account.balance += amount
-        this.accountRepository.updateBalance(accountId, amount)
+        const account = this.getId(accountId)
+        account.balance += Number(amount)
+        this.accountRepository.update(accountId, account)
       }
-      return this.accountRepository.findOneById(accountId).balance
-    } catch (error) {
+      return this.getId(accountId).balance
+    }
+    catch (error) {
       throw new Error("Error en addBalance" + error)
     }
   }
@@ -78,11 +95,12 @@ export class AccountService {
    * @param {number} amount
    * @memberof AccountService
    */
-  removeBalance(accountId: string, amount: number): void {
+  removeBalance(accountId: string, amount: number): number {
     try {
       if (this.verifyAmountIntoBalance(accountId, amount)) {
         this.accountRepository.updateBalance(accountId, -amount)
       }
+      return this.getId(accountId).balance
     } catch (error) {
       throw new InternalServerErrorException(error)
     }
@@ -99,7 +117,7 @@ export class AccountService {
   verifyAmountIntoBalance(accountId: string, amount: number): boolean {
     try {
       if (amount > 0 &&
-        this.accountRepository.findOneById(accountId).balance >= amount) {
+        this.getId(accountId).balance >= amount) {
         return true
       } else return false
     } catch (error) {
@@ -148,7 +166,15 @@ export class AccountService {
    */
   getAccountType(accountId: string): AccountTypeEntity {
     try {
-      return this.getId(accountId).accountType
+      return this.accountTypeRepository.findOneById(accountId)
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
+
+  getDocumentType(accountId: string): DocumentTypeEntity {
+    try {
+      return this.documentTypeRepository.findOneById(accountId)
     } catch (error) {
       throw new InternalServerErrorException(error)
     }
@@ -162,9 +188,7 @@ export class AccountService {
    * @return {*}  {AccountTypeEntity}
    * @memberof AccountService
    */
-  changeAccountType(
-    account: ChangeAccountTypeDto
-  ): AccountTypeEntity {
+  changeAccountType(account: ChangeAccountTypeDto): AccountTypeEntity {
     try {
       const changeType = this.accountRepository.findOneById(account.accountId)
       changeType.accountType = this.accountTypeRepository.findOneById(account.accountTypeId)
@@ -180,9 +204,9 @@ export class AccountService {
    * @param {string} accountId
    * @memberof AccountService
    */
-  deleteAccount(accountId: string): void {
+  deleteAccount(accountId: string, soft?: boolean): void {
     try {
-      this.accountRepository.delete(accountId)
+      this.accountRepository.delete(accountId, soft)
     } catch (error) {
       throw new InternalServerErrorException(error)
     }

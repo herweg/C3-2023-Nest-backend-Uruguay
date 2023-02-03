@@ -4,10 +4,10 @@ import { AccountTypeModel, CustomerModel } from '../../data/models';
 export class CreateAccountDto {
 
     @IsNotEmpty()
-    accountType: AccountTypeModel
+    accountTypeId: string
 
     @IsNotEmpty()
-    customer: CustomerModel
+    customerId: string
 }
 
 /**

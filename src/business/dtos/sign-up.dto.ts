@@ -2,9 +2,6 @@ import { IsEmail, IsNumberString, IsUUID, IsString } from 'class-validator';
 
 export class SignUpDto {
 
-    //@IsUUID(4, { message: "this must to be uuid" })
-    //documentTypeId: string;
-
     @IsNumberString()
     document: string;
 
@@ -20,9 +17,11 @@ export class SignUpDto {
     @IsString()
     password: string;
 
+    //@IsUUID(4, { message: "This must be UUID" })
     @IsString()
-    accountTypeName: string
+    accountTypeId: string
 
+    //@IsUUID(4, { message: "This must be UUID" })
     @IsString()
-    documentTypeName: string
+    documentTypeId: string
 }

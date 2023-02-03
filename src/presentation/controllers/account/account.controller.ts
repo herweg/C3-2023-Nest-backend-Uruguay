@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Patch, Post, Delete, Param, Logger } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Delete, Param, Logger, Query } from '@nestjs/common';
 import { AccountService } from 'src/business/services';
 import { AccountEntity, AccountTypeEntity } from 'src/data';
 import { ChangeAccountTypeDto, CreateAccountDto } from 'src/business/dtos';
 import { TypeDto } from '../../../business/dtos/type.dto';
+import { DocumentTypeEntity } from '../../../data/persistance/entities/document-type.entity';
 
 @Controller('account')
 export class AccountController {
@@ -14,9 +15,19 @@ export class AccountController {
         return this.accountService.createAccount(createAccount)
     }
 
-    @Post("type/create/")
-    createAccountType(@Body() accountTypeDto: TypeDto): AccountTypeEntity {
-        return this.accountService.createAccountType(accountTypeDto)
+    @Post("account-type")
+    createAccountType(@Body() name: TypeDto): AccountTypeEntity {
+        return this.accountService.createAccountType(name)
+    }
+
+    @Post("document-type")
+    createDocumentType(@Body() name: TypeDto): DocumentTypeEntity {
+        return this.accountService.createDocumentType(name)
+    }
+
+    @Get("id/:id")
+    getAccount(@Param("id") accountId: string): AccountEntity {
+        return this.accountService.getId(accountId)
     }
 
     @Get("getbalance/:id")
@@ -24,18 +35,18 @@ export class AccountController {
         return this.accountService.getBalance(accountId)
     }
 
-    @Post("addbalance")
-    addBalance(@Body() accountId: string, amount: number) {
+    @Post("addbalance/:id/:amount")
+    addBalance(@Param("id") accountId: string, @Param("amount") amount: number): number {
         return this.accountService.addBalance(accountId, amount)
     }
 
-    @Post("removebalance")
-    removeBalance(@Body() accountId: string, amount: number) {
+    @Post("removebalance/:id/:amount")
+    removeBalance(@Param("id") accountId: string, @Param("amount") amount: number) {
         return this.accountService.removeBalance(accountId, amount)
     }
 
-    @Get("cantransfer")
-    verifyAmountIntoBalance(@Body() accountId: string, amount: number): boolean {
+    @Get("cantransfer/:id/:amount")
+    verifyAmountIntoBalance(@Param("id") accountId: string, @Param("amount") amount: number): boolean {
         return this.accountService.verifyAmountIntoBalance(accountId, amount)
     }
 
@@ -50,8 +61,8 @@ export class AccountController {
     }
 
     @Get("accounttype/:id")
-    getAccountType(@Param("id") accountId: string) {
-        this.accountService.getAccountType(accountId)
+    getAccountType(@Param("id") accountId: string): AccountTypeEntity {
+        return this.accountService.getAccountType(accountId)
     }
 
     @Patch("changeacctype")
@@ -60,8 +71,8 @@ export class AccountController {
     }
 
     @Delete("delete/:id")
-    deleteAccount(@Param("id") accountId: string) {
-        this.accountService.deleteAccount(accountId)
+    deleteAccount(@Param("id") accountId: string, @Query("soft") soft?: boolean) {
+        this.accountService.deleteAccount(accountId, soft)
     }
 
     // tests

@@ -14,17 +14,16 @@ export class CustomerRepository
   }
 
   update(id: string, entity: CustomerEntity): CustomerEntity {
-    const indexCurrentEntity = this.database.findIndex(
-      (item) => item.id === id
-        && typeof item.deletedAt === 'undefined',
-    )
-    if (indexCurrentEntity >= 0)
-      this.database[indexCurrentEntity] = {
-        ...this.database[indexCurrentEntity],
-        ...entity,
-        id,
-      } as CustomerEntity
-    else throw new NotFoundException()
+    const indexCurrentEntity = this.database.findIndex(item => {
+      item.id === id && typeof item.deletedAt === 'undefined'
+    })
+    if (indexCurrentEntity == -1)
+    throw new NotFoundException("customer.repository.update")
+    this.database[indexCurrentEntity] = {
+      ...this.database[indexCurrentEntity],
+      ...entity,
+      id,
+    } as CustomerEntity
     return this.database[indexCurrentEntity]
   }
 

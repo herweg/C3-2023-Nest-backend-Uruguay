@@ -1,26 +1,25 @@
 import { IsNumberString, IsUUID, IsAlphanumeric, IsEmail, IsString  } from 'class-validator';
-import { DocumentTypeModel } from 'src/data/models';
 
 export class CustomerDto{
     
-    @IsUUID()
-    id: string;
+    // @IsUUID(4, { message: "This must be UUID" })
+    // id?: string;
 
     @IsNumberString()
-    documentType: DocumentTypeModel;
+    documentTypeId: string
 
     @IsString()
-    document: string;
+    document: string
 
     @IsString()
-    fullName: string;
+    fullName: string
 
     @IsEmail()
-    email: string;
+    email: string
 
     @IsNumberString()
-    phone: string;
+    phone: string
 
     @IsAlphanumeric()
-    password: string;
+    password: string
 }

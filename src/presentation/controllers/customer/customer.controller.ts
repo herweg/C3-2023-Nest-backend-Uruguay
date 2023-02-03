@@ -12,8 +12,8 @@ export class CustomerController {
         return this.customerService.getCustomerInfo(customerId)
     }
 
-    @Patch("update")
-    updateCustomer(@Body() id: string, customer: CustomerDto):CustomerEntity {
+    @Patch("update/:id")
+    updateCustomer(@Param("id") id: string,@Body() customer: CustomerDto):CustomerEntity {
         return this.customerService.updatedCustomer(id, customer)
     }
 

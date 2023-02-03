@@ -29,15 +29,22 @@ export class TransferService {
       const newTransfer = new TransferEntity()
       const newIncome = this.accountService.getId(transfer.income)
       const newOutcome = this.accountService.getId(transfer.outcome)
-      newTransfer.amount = transfer.amount
-      newTransfer.income = newIncome
+
       newTransfer.outcome = newOutcome
+      newTransfer.income = newIncome
+      newTransfer.amount = transfer.amount
       newTransfer.reason = transfer.reason
       newTransfer.dateTime = Date.now()
       this.transferRepository.register(newTransfer)
+
       //Feed the Deposit (observer) to the Observable
       this.transferSubject.next(newTransfer)
-      
+
+      if (transfer) {
+        this.accountService.removeBalance(transfer.outcome, transfer.amount)
+        this.accountService.addBalance(transfer.income, transfer.amount)
+      }
+
       return newTransfer
     } catch (error) {
       throw new Error("Error en createTransfer" + error)
@@ -58,9 +65,12 @@ export class TransferService {
     pagination?: PaginationDto,
     dataRange?: DataRangeDto,
   ): TransferEntity[] {
-    if (!dataRange?.min || !dataRange?.max) throw new Error("Error")
-    this.transferRepository.findOutcomeByDataRange(accountId, dataRange?.min, dataRange?.max, pagination)
-    return this.transferRepository.getAll()
+    dataRange = {
+      ... { min: 0, max: Date.now() },
+      ...dataRange,
+    }
+    return this.transferRepository.findOutcomeByDataRange(accountId, dataRange?.min, dataRange?.max, pagination)
+    //throw new Error("Error")
   }
 
   /**
@@ -77,9 +87,12 @@ export class TransferService {
     pagination?: PaginationDto,
     dataRange?: DataRangeDto,
   ): TransferEntity[] {
-    if (!dataRange?.min || !dataRange?.max) throw new Error("Error")
-    this.transferRepository.findIncomeByDataRange(accountId, dataRange?.min, dataRange?.max, pagination)
-    return this.transferRepository.getAll()
+    dataRange = {
+      ... { min: 0, max: Date.now() },
+      ...dataRange,
+    }
+    return this.transferRepository.findIncomeByDataRange(accountId, dataRange?.min, dataRange?.max, pagination)
+    //throw new Error("Error")
   }
 
   /**
@@ -97,8 +110,11 @@ export class TransferService {
     dataRange?: DataRangeDto,
   ): TransferEntity[] {
     try {
-      const thisHistory = this.getHistoryIn(accountId, pagination, dataRange)
-        .concat(this.getHistoryOut(accountId, pagination, dataRange))
+      dataRange = {
+        ... { min: 0, max: Date.now() },
+        ...dataRange,
+      }
+      const thisHistory = this.transferRepository.findByDataRange(accountId, dataRange?.min, dataRange?.max, pagination)
       return thisHistory
     } catch (error) {
       throw new Error("Error en getHistory" + error)

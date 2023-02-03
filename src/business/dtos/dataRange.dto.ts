@@ -1,8 +1,7 @@
-import { IsDateString } from 'class-validator';
 export class DataRangeDto {
 
-    @IsDateString()
+    //@IsDateString()
     min: number | Date
-    @IsDateString()
+    //@IsDateString()
     max: number | Date
 }
