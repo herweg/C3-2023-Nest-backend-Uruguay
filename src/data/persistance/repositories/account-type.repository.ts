@@ -38,10 +38,10 @@ export class AccountTypeRepository
     }
 
     findOneById(id: string): AccountTypeEntity {
-        const currentEntity = this.database.find(
+        const currentEntity = this.database.findIndex(
             (item) => item.id === id)
         if (!currentEntity) throw new NotFoundException()
-        else return currentEntity
+        else return this.database[currentEntity]
     }
 
     findByState(state: boolean): AccountTypeEntity[] {

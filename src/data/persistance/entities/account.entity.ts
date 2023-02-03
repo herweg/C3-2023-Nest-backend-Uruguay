@@ -11,3 +11,11 @@ export class AccountEntity implements AccountModel {
     state: boolean = true
     deletedAt?: number | Date
 }
+
+/*
+{
+    "id" = uuid(),
+    "customer": CustomerEntity,
+    "accountType": AccountTypeEntity
+}
+*/

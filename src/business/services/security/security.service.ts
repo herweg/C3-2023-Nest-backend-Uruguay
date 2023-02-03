@@ -4,7 +4,6 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { v4 as uuid } from 'uuid';
 // Data transfer objects
 import { CreateAccountDto, SignInDto, SignUpDto } from 'src/business/dtos';
 // Repositories & Entities
@@ -38,8 +37,9 @@ export class SecurityService {
       user.email,
       user.password,
     )
-    if (answer) return jwt.sign(user, process.env.TOKEN_SECRET || "tokentest")
-    else throw new UnauthorizedException()
+    if (!answer) throw new UnauthorizedException()
+    return jwt.sign(user, process.env.TOKEN_SECRET || "tokentest")
+
   }
 
   /**
@@ -64,8 +64,8 @@ export class SecurityService {
     const customer = this.customerRepository.register(newCustomer)
     this.documentTypeRepo.register(documentType)
 
-    if (customer === undefined) 
-    throw new InternalServerErrorException() // ERRORRRRRRRRRRRRRRRR
+    if (customer === undefined)
+      throw new InternalServerErrorException() // ERRORRRRRRRRRRRRRRRR
 
     //Definiendo una Account Type
     const accountType = new AccountTypeEntity()
@@ -74,10 +74,10 @@ export class SecurityService {
     accountEnt.customer = customer
     accountEnt.accountType = accountType
     accountType.name = user.accountTypeName
-    
+
     const newAccount = new CreateAccountDto()
-    newAccount.accountTypeId = accountType
-    newAccount.customerId = customer
+    newAccount.accountType = accountType
+    newAccount.customer = customer
 
     const account = this.accountService.createAccount(newAccount)
 
@@ -92,6 +92,10 @@ export class SecurityService {
    * @memberof SecurityService
    */
   signOut(JWToken: string): void {
-
+    /**verificar token
+     jwt.verify token
+      si es igual?
+      return deslogueado :) (no hace nada)
+     */
   }
 }

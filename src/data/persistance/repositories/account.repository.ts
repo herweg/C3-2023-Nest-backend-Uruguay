@@ -9,22 +9,22 @@ export class AccountRepository
     implements AccountRepositoryInterface {
 
     register(entity: AccountEntity): AccountEntity {
-        this.database.push(entity);
-        return this.database.at(-1) ?? entity;
+        this.database.push(entity)
+        return this.database.at(-1) ?? entity
     }
 
     update(id: string, entity: AccountEntity): AccountEntity {
         const indexCurrentEntity = this.database.findIndex(
             (item) => item.id === id && typeof item.deletedAt === 'undefined',
-        );
+        )
         if (indexCurrentEntity >= 0)
             this.database[indexCurrentEntity] = {
                 ...this.database[indexCurrentEntity],
                 ...entity,
                 id,
-            } as AccountEntity;
-        else throw new NotFoundException();
-        return this.database[indexCurrentEntity];
+            } as AccountEntity
+        else throw new NotFoundException()
+        return this.database[indexCurrentEntity]
     }
 
     updateBalance(id: string, balance: number): void {
@@ -54,38 +54,38 @@ export class AccountRepository
     findAll(): AccountEntity[] {
         return this.database.filter(
             (item) => typeof item.deletedAt === 'undefined',
-        );
+        )
     }
 
     findOneById(id: string): AccountEntity {
-        const currentEntity = this.database.find(
-            (item) => item.id === id && typeof item.deletedAt === 'undefined',
-        );
-        if (!currentEntity) throw new NotFoundException()
-        else return currentEntity
+        const currentEntity = this.database.findIndex(
+            item => item.id === id && typeof item.deletedAt === 'undefined',
+        )
+        if (currentEntity == -1) throw new NotFoundException()
+        return this.database[currentEntity]
     }
 
     findByState(state: boolean): AccountEntity[] {
         const currentEntity = this.database.filter(
             (item) => item.state === state && typeof item.deletedAt === 'undefined',
         )
-        if (!currentEntity) throw new NotFoundException()
-        else return currentEntity
+        if (currentEntity === undefined) throw new NotFoundException()
+        return currentEntity
     }
 
     findByCustomer(customerId: string): AccountEntity[] {
         const currentEntity = this.database.filter(
             (item) => item.customer.id === customerId && typeof item.deletedAt === 'undefined',
         )
-        if (!currentEntity) throw new NotFoundException()
-        else return currentEntity
+        if (currentEntity === undefined) throw new NotFoundException()
+        return currentEntity
     }
 
     findByAccountType(accountTypeId: string): AccountEntity[] {
         const currentEntity = this.database.filter(
             (item) => item.accountType.id === accountTypeId && typeof item.deletedAt === 'undefined',
         )
-        if (!currentEntity) throw new NotFoundException()
-        else return currentEntity
+        if (currentEntity === undefined) throw new NotFoundException()
+        return currentEntity
     }
 }

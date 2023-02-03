@@ -9,9 +9,13 @@ export class DepositRepository
     implements DepositRepositoryInterface {
 
     register(entity: DepositEntity): DepositEntity {
-        this.database.push(entity);
-        return this.database.at(-1) ?? entity;
-    }
+        try {
+            this.database.push(entity)            
+            return this.database.at(-1) ?? entity
+        
+        } catch (error) {
+            throw new Error(error)
+        }}
 
     update(id: string, entity: DepositEntity): DepositEntity {
         const indexCurrentEntity = this.database.findIndex(
@@ -50,21 +54,21 @@ export class DepositRepository
 
     findAll(): DepositEntity[] {
         return this.database.filter(
-            (item) => typeof item.deletedAt === 'undefined',
+            (deposit) => typeof deposit.deletedAt === 'undefined',
         )
     }
 
     findOneById(id: string): DepositEntity {
-        const currentEntity = this.database.find(
-            (item) => item.id === id && typeof item.deletedAt === 'undefined',
+        const currentEntity = this.database.findIndex(
+            (deposit) => deposit.id === id && typeof deposit.deletedAt === 'undefined',
         );
-        if (!currentEntity) throw new NotFoundException()
-        else return currentEntity
+        if (currentEntity == -1) throw new NotFoundException()
+        else return this.database[currentEntity]
     }
 
     findByAccountId(accountId: string): DepositEntity[] {
         const currentEntity = this.database.filter(
-            (item) => item.account.id === accountId)
+            (deposit) => deposit.account.id === accountId)
         if (!currentEntity) throw new NotFoundException()
         else return currentEntity
     }
@@ -74,10 +78,10 @@ export class DepositRepository
         dateEnd: Date | number,
     ): DepositEntity[] {
         const currentEntity = this.database.filter(
-            (item) =>
-                dateInit > item.dateTime
-                && item.dateTime < dateEnd
-                && typeof item.deletedAt === "undefined"
+            (deposit) =>
+                dateInit > deposit.dateTime
+                && deposit.dateTime < dateEnd
+                && typeof deposit.deletedAt === "undefined"
         )
         if (!currentEntity) throw new NotFoundException()
         else return currentEntity

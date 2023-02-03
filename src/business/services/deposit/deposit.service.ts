@@ -1,12 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { DepositEntity, DepositRepository } from 'src/data';
 import { DepositDto } from 'src/business/dtos';
 import { DataRangeModel, PaginationModel } from 'src/data/models';
+import { AccountService } from '../account/account.service';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class DepositService {
 
-  constructor(private readonly depositRepository: DepositRepository) { }
+  constructor(private readonly depositRepository: DepositRepository,
+    private readonly accountService: AccountService) {
+  }
+
+  //Instance of subject
+  private depositSubject = new Subject<DepositEntity>();
+
+  //Create observable
+  get depositObservable() {
+    return this.depositSubject.asObservable();
+  }
 
   /**
    * Crear un deposito
@@ -16,11 +28,23 @@ export class DepositService {
    * @memberof DepositService
    */
   createDeposit(deposit: DepositDto): DepositEntity {
-    const newDeposit = new DepositEntity()
-    newDeposit.account = deposit.account
-    newDeposit.amount = deposit.amount
-    newDeposit.dateTime = Date.now()
-    return this.depositRepository.register(newDeposit)
+    try {
+      //Nuevo deposito y mapeado
+      const newDeposit = new DepositEntity()
+      newDeposit.account = this.accountService.getId(deposit.id)
+      newDeposit.amount = deposit.amount
+      newDeposit.dateTime = Date.now()
+      //Add new balance
+      this.accountService.getId(deposit.id).balance += deposit.amount
+      //Deposit registry
+      this.depositRepository.register(newDeposit)
+      //Feed the Deposit (observer) to the Observable
+      this.depositSubject.next(newDeposit)
+
+      return newDeposit
+    } catch (error) {
+      throw new Error("Error en createDeposit" + error)
+    }
   }
 
   /**
@@ -29,8 +53,12 @@ export class DepositService {
    * @param {string} depositId
    * @memberof DepositService
    */
-  deleteDeposit(depositId: string, soft?:boolean): void {
-    this.depositRepository.delete(depositId)
+  deleteDeposit(depositId: string, soft?: boolean): void {
+    try {
+      this.depositRepository.delete(depositId)
+    } catch (error) {
+      throw new Error("Error en deleteDeposit" + error)
+    }
   }
 
   /**
@@ -47,7 +75,7 @@ export class DepositService {
     pagination?: PaginationModel,
     dataRange?: DataRangeModel,
   ): DepositEntity[] {
-    if (!dataRange?.max || !dataRange.min) throw new Error("error") 
+    if (!dataRange?.max || !dataRange.min) throw new Error("Error en getHistory")
     const depositArrayByDate = this.depositRepository.findByDataRange(dataRange?.min, dataRange?.max)
     return depositArrayByDate.filter(id => id.id === depositId)
   }

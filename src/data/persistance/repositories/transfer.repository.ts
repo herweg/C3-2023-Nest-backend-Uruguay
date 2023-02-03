@@ -55,11 +55,11 @@ export class TransferRepository
     }
 
     findOneById(id: string): TransferEntity {
-        const currentEntity = this.database.find(
+        const currentEntity = this.database.findIndex(
             (item) => item.id === id && typeof item.deletedAt === 'undefined',
         );
-        if (!currentEntity) throw new NotFoundException()
-        else return currentEntity
+        if (currentEntity == -1) throw new NotFoundException()
+        return this.database[currentEntity]
     }
 
     findOutcomeByDataRange(

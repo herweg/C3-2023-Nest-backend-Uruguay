@@ -16,15 +16,19 @@ export class TransferService {
    * @memberof TransferService
    */
   createTransfer(transfer: TransferDto): TransferEntity {
-    const newTransfer = new TransferEntity()
-    const newIncome = this.accountService.getId(transfer.income)
-    const newOutcome = this.accountService.getId(transfer.outcome)
-    newTransfer.amount = transfer.amount
-    newTransfer.income = newIncome
-    newTransfer.outcome = newOutcome
-    newTransfer.reason = transfer.reason
-    newTransfer.dateTime = Date.now()
-    return this.trasnferRepository.register(newTransfer)
+    try {
+      const newTransfer = new TransferEntity()
+      const newIncome = this.accountService.getId(transfer.income)
+      const newOutcome = this.accountService.getId(transfer.outcome)
+      newTransfer.amount = transfer.amount
+      newTransfer.income = newIncome
+      newTransfer.outcome = newOutcome
+      newTransfer.reason = transfer.reason
+      newTransfer.dateTime = Date.now()
+      return this.trasnferRepository.register(newTransfer)
+    } catch (error) {
+      throw new Error("Error en createTransfer" + error)
+    }
   }
 
   /**
@@ -79,9 +83,13 @@ export class TransferService {
     pagination?: PaginationDto,
     dataRange?: DataRangeDto,
   ): TransferEntity[] {
-    const thisHistory = this.getHistoryIn(accountId, pagination, dataRange)
-      .concat(this.getHistoryOut(accountId, pagination, dataRange))
-    return thisHistory
+    try {
+      const thisHistory = this.getHistoryIn(accountId, pagination, dataRange)
+        .concat(this.getHistoryOut(accountId, pagination, dataRange))
+      return thisHistory
+    } catch (error) {
+      throw new Error("Error en getHistory" + error)
+    }
   }
 
   /**
@@ -91,6 +99,10 @@ export class TransferService {
    * @memberof TransferService
    */
   deleteTransfer(transferId: string): void {
-    this.trasnferRepository.delete(transferId)
+    try {
+      this.trasnferRepository.delete(transferId)
+    } catch (error) {
+      throw new Error("Error en deleteTransfer" + error)
+    }
   }
 }

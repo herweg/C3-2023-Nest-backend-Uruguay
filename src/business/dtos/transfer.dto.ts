@@ -15,3 +15,12 @@ export class TransferDto {
     @IsString()
     reason: string
 }
+
+/*
+{
+    "outcome": "string",
+    "income": "string",
+    "amount": "number",
+    "reason": "string"
+}
+*/

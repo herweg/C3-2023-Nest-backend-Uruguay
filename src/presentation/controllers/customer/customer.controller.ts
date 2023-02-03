@@ -21,4 +21,9 @@ export class CustomerController {
     unsubscribe(@Param("id") id: string):void {
         this.customerService.unsubscribe(id)
     }
+
+    @Get("getall")
+    getAll():CustomerEntity[]{
+        return this.customerService.getAll()
+    }
 }

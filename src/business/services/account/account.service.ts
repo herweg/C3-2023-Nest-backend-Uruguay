@@ -5,14 +5,15 @@ import { ChangeAccountTypeDto, CreateAccountDto } from 'src/business/dtos';
 
 // Repositories & Entities
 import { AccountEntity, AccountRepository, AccountTypeEntity, AccountTypeRepository, CustomerRepository } from 'src/data';
+import { TypeDto } from '../../dtos/type.dto';
 
 
 
 @Injectable()
 export class AccountService {
+
   constructor(private readonly accountRepository: AccountRepository,
-    private readonly accountTypeRepository: AccountTypeRepository,
-    private readonly customerRepository: CustomerRepository) { }
+    private readonly accountTypeRepository: AccountTypeRepository,) { }
 
 
   getId(id: string): AccountEntity {
@@ -27,11 +28,16 @@ export class AccountService {
    * @memberof AccountService
    */
   createAccount(account: CreateAccountDto): AccountEntity {
-    const newAccount = new AccountEntity();
-    newAccount.accountType = account.accountTypeId;
-    newAccount.customer = account.customerId
-    this.customerRepository.register(newAccount.customer)
-    return this.accountRepository.register(newAccount);
+    const newAccount = new AccountEntity()
+    newAccount.accountType = account.accountType
+    newAccount.customer = account.customer
+    return this.accountRepository.register(newAccount)
+  }
+
+  createAccountType(accountTypeDto: TypeDto): AccountTypeEntity {
+    const newAccountType = new AccountTypeEntity()
+    newAccountType.name = accountTypeDto.name
+    return this.accountTypeRepository.register(newAccountType)
   }
 
   /**
@@ -42,8 +48,7 @@ export class AccountService {
    * @memberof AccountService
    */
   getBalance(accountId: string): number {
-    const account = this.accountRepository.findOneById(accountId)
-    return account.balance
+    return this.getId(accountId).balance
   }
 
   /**
@@ -53,9 +58,16 @@ export class AccountService {
    * @param {number} amount
    * @memberof AccountService
    */
-  addBalance(accountId: string, amount: number): void {
-    if (amount > 0) {
-      this.accountRepository.updateBalance(accountId, amount)
+  addBalance(accountId: string, amount: number): number {
+    try {
+      const account = this.getId(accountId)
+      if (amount > 0) {
+        account.balance += amount
+        this.accountRepository.updateBalance(accountId, amount)
+      }
+      return this.accountRepository.findOneById(accountId).balance
+    } catch (error) {
+      throw new Error("Error en addBalance" + error)
     }
   }
 
@@ -134,9 +146,9 @@ export class AccountService {
    * @return {*}  {AccountTypeEntity}
    * @memberof AccountService
    */
-  getAccountType(accountId: string): AccountEntity {
+  getAccountType(accountId: string): AccountTypeEntity {
     try {
-      return this.accountRepository.findOneById(accountId)
+      return this.getId(accountId).accountType
     } catch (error) {
       throw new InternalServerErrorException(error)
     }
@@ -173,6 +185,15 @@ export class AccountService {
       this.accountRepository.delete(accountId)
     } catch (error) {
       throw new InternalServerErrorException(error)
+    }
+  }
+
+  // test
+  getAll(): AccountEntity[] {
+    try {
+      return this.accountRepository.findAll()
+    } catch (error) {
+      throw new Error("Error en getAll" + error)
     }
   }
 }

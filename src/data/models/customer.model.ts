@@ -12,3 +12,16 @@ export interface CustomerModel {
     state: boolean;
     daletedAt?: Date | number;
 }
+
+/*
+{
+    "id": "string",
+    "documentType": DocumentTypeModel,
+    "document": "string",
+    "fullName": "string",
+    "email": "string",
+    "phone": "string",
+    "password": "string",
+    "state": boolean
+}
+*/
