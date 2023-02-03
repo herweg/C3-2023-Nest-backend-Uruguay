@@ -3,10 +3,11 @@ import { TransferEntity, TransferRepository } from 'src/data';
 import { DataRangeDto, PaginationDto, TransferDto } from 'src/business/dtos';
 import { AccountService } from '../account';
 import { Subject } from 'rxjs';
+import { PaginationModel } from 'src/data/models';
 
 @Injectable()
 export class TransferService {
-  constructor(private readonly trasnferRepository: TransferRepository,
+  constructor(private readonly transferRepository: TransferRepository,
     private readonly accountService: AccountService) { }
 
   //Instance of subject
@@ -33,7 +34,7 @@ export class TransferService {
       newTransfer.outcome = newOutcome
       newTransfer.reason = transfer.reason
       newTransfer.dateTime = Date.now()
-      this.trasnferRepository.register(newTransfer)
+      this.transferRepository.register(newTransfer)
       //Feed the Deposit (observer) to the Observable
       this.transferSubject.next(newTransfer)
       
@@ -58,8 +59,8 @@ export class TransferService {
     dataRange?: DataRangeDto,
   ): TransferEntity[] {
     if (!dataRange?.min || !dataRange?.max) throw new Error("Error")
-    this.trasnferRepository.findOutcomeByDataRange(accountId, dataRange?.min, dataRange?.max, pagination)
-    return this.trasnferRepository.findAll()
+    this.transferRepository.findOutcomeByDataRange(accountId, dataRange?.min, dataRange?.max, pagination)
+    return this.transferRepository.getAll()
   }
 
   /**
@@ -77,8 +78,8 @@ export class TransferService {
     dataRange?: DataRangeDto,
   ): TransferEntity[] {
     if (!dataRange?.min || !dataRange?.max) throw new Error("Error")
-    this.trasnferRepository.findIncomeByDataRange(accountId, dataRange?.min, dataRange?.max, pagination)
-    return this.trasnferRepository.findAll()
+    this.transferRepository.findIncomeByDataRange(accountId, dataRange?.min, dataRange?.max, pagination)
+    return this.transferRepository.getAll()
   }
 
   /**
@@ -104,6 +105,10 @@ export class TransferService {
     }
   }
 
+  getAll(pagination: PaginationModel): TransferEntity[] {
+    return this.transferRepository.getAll();
+  }
+
   /**
    * Borrar una transacción
    *
@@ -112,7 +117,7 @@ export class TransferService {
    */
   deleteTransfer(transferId: string): void {
     try {
-      this.trasnferRepository.delete(transferId)
+      this.transferRepository.delete(transferId)
     } catch (error) {
       throw new Error("Error en deleteTransfer" + error)
     }

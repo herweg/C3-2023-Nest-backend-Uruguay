@@ -92,10 +92,7 @@ export class SecurityService {
    * @memberof SecurityService
    */
   signOut(JWToken: string): void {
-    /**verificar token
-     jwt.verify token
-      si es igual?
-      return deslogueado :) (no hace nada)
-     */
+    if (!jwt.verify(JWToken, process.env.TOKEN_SECRET || 'tokentest')) throw new Error('JWT Not Valid')
+    console.log('SignOut Completed')
   }
 }

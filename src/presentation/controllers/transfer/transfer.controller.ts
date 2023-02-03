@@ -2,19 +2,25 @@ import { Body, Controller, Get, Patch, Post, Delete, Param, Logger } from '@nest
 import { TransferService } from 'src/business/services';
 import { TransferEntity } from 'src/data';
 import { DataRangeDto, PaginationDto, TransferDto } from 'src/business/dtos';
+import { PaginationModel } from 'src/data/models';
 
 @Controller('transfer')
 export class TransferController {
     constructor(private readonly transferService: TransferService) { }
     private logger = new Logger('DepositController');
-    
+
     @Post("create")
     createTransfer(@Body() newTransfer: TransferDto): TransferEntity {
         //Subscribe observer
-        this.transferService.transferObservable.subscribe(transfer=>{
+        this.transferService.transferObservable.subscribe(transfer => {
             this.logger.log(`Transfer ${transfer} created`)
         })
         return this.transferService.createTransfer(newTransfer)
+    }
+
+    @Get('/find-all')
+    getAll(@Body() paginator: PaginationModel): TransferEntity[] {
+        return this.transferService.getAll(paginator)
     }
 
     @Get("historyout")
@@ -33,11 +39,11 @@ export class TransferController {
         return this.transferService.getHistoryIn(accountId, pagination, dataRange)
     }
 
-    @Get("history")
-    getHistory(@Body()
+    @Get("history/:id")
+    getHistory(@Param("id")
     accountId: string,
         pagination?: PaginationDto,
-        dataRange?: DataRangeDto): TransferEntity[] {
+        @Body() dataRange?: DataRangeDto): TransferEntity[] {
         return this.transferService.getHistory(accountId, pagination, dataRange)
     }
 

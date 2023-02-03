@@ -4,10 +4,14 @@ import { TransferEntity } from "../entities";
 import { BaseRepository } from "./base";
 import { TrasnferRepositoryInterface } from "./interfaces";
 
+
 @Injectable()
 export class TransferRepository
     extends BaseRepository<TransferEntity>
     implements TrasnferRepositoryInterface {
+    findAll(): TransferEntity[] {
+        throw new Error("Method not implemented.");
+    }
 
     register(entity: TransferEntity): TransferEntity {
         this.database.push(entity);
@@ -48,11 +52,12 @@ export class TransferRepository
         }
     }
 
-    findAll(): TransferEntity[] {
+    getAll(): TransferEntity[] {
         return this.database.filter(
             (item) => typeof item.deletedAt === 'undefined',
         )
     }
+
 
     findOneById(id: string): TransferEntity {
         const currentEntity = this.database.findIndex(
