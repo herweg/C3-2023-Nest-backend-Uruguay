@@ -1,14 +1,19 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Post } from '@nestjs/common';
 import { DepositService } from 'src/business/services';
 import { DepositEntity } from 'src/data';
-import { DepositDto } from 'src/data/dtos';
+import { DepositDto } from 'src/business/dtos';
 
 @Controller('deposit')
 export class DepositController {
     constructor(private readonly depositService: DepositService) { }
+    private logger = new Logger('DepositController');
 
-    @Post()
+    @Post("create")
     createDeposit(@Body() newDeposit: DepositDto): DepositEntity {
+        //subscribe observer
+        this.depositService.depositObservable.subscribe(deposit => {
+            this.logger.log(`Deposit ${deposit.id} created`)
+        })
         return this.depositService.createDeposit(newDeposit)
     }
 
@@ -18,7 +23,7 @@ export class DepositController {
     }
 
     @Get("history/:id")
-    getHistory(@Param("id") depositId: string){
+    getHistory(@Param("id") depositId: string) {
         return this.depositService.getHistory(depositId)
     }
 }

@@ -11,7 +11,7 @@ import { ParseUUIDPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
-  app.useGlobalPipes(new ParseUUIDPipe())
+  //app.useGlobalPipes(new ParseUUIDPipe())
   await app.listen(3000)
 }
 bootstrap()

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { CustomerService } from 'src/business/services';
 import { CustomerEntity } from 'src/data';
-import { CustomerDto } from 'src/data/dtos';
+import { CustomerDto } from 'src/business/dtos';
 
 @Controller('customer')
 export class CustomerController {
@@ -20,5 +20,10 @@ export class CustomerController {
     @Patch("delete/:id")
     unsubscribe(@Param("id") id: string):void {
         this.customerService.unsubscribe(id)
+    }
+
+    @Get("getall")
+    getAll():CustomerEntity[]{
+        return this.customerService.getAll()
     }
 }

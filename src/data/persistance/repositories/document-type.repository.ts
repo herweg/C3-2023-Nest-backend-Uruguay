@@ -35,17 +35,17 @@ export class DocumentTypeRepository
     }
 
     findOneById(id: string): DocumentTypeEntity {
-        const currentEntity = this.database.find(
+        const currentEntity = this.database.findIndex(
             (item) => item.id === id)
-        if (!currentEntity) throw new NotFoundException()
-        else return currentEntity
+        if (currentEntity == -1) throw new NotFoundException()
+        return this.database[currentEntity]
     }
 
     findByState(state: boolean): DocumentTypeEntity[] {
         const currentEntity = this.database.filter(
             (item) => item.state === state)
         if (!currentEntity) throw new NotFoundException()
-        else return currentEntity
+        return currentEntity
     }
 
     findByName(name: string): DocumentTypeEntity[] {

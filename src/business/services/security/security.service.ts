@@ -4,23 +4,26 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { v4 as uuid } from 'uuid';
 // Data transfer objects
-import { CreateAccountDto, SignInDto, SignUpDto } from 'src/data/dtos';
+import { CreateAccountDto, SignInDto, SignUpDto } from 'src/business/dtos';
 // Repositories & Entities
-import { AccountEntity, AccountTypeEntity, CustomerEntity, 
-  CustomerRepository, DocumentTypeEntity } from 'src/data';
+import {
+  AccountEntity, AccountTypeEntity, CustomerEntity,
+  CustomerRepository, DocumentTypeEntity
+} from 'src/data';
 // Services
 import { AccountService } from '../account';
 
 // JWT
 import * as jwt from "jsonwebtoken"
+import { DocumentTypeRepository } from '../../../data/persistance/repositories/document-type.repository';
 
 @Injectable()
 export class SecurityService {
   constructor(
     private readonly customerRepository: CustomerRepository,
     private readonly accountService: AccountService,
+    private readonly documentTypeRepo: DocumentTypeRepository
   ) { }
   /**
  * Identificarse en el sistema
@@ -33,9 +36,10 @@ export class SecurityService {
     const answer = this.customerRepository.findOneByEmailAndPassword(
       user.email,
       user.password,
-    );
-    if (answer) return jwt.sign(user, process.env.TOKEN_SECRET || "tokentest")
-    else throw new UnauthorizedException()
+    )
+    if (!answer) throw new UnauthorizedException()
+    return jwt.sign(user, process.env.TOKEN_SECRET || "tokentest")
+
   }
 
   /**
@@ -47,7 +51,7 @@ export class SecurityService {
    */
   signUp(user: SignUpDto): string {
     const documentType = new DocumentTypeEntity()
-    documentType.id = user.documentTypeId
+    documentType.name = user.documentTypeName
 
     const newCustomer = new CustomerEntity();
     newCustomer.documentType = documentType;
@@ -57,22 +61,28 @@ export class SecurityService {
     newCustomer.phone = user.phone;
     newCustomer.password = user.password;
 
-    const customer = this.customerRepository.register(newCustomer);
+    const customer = this.customerRepository.register(newCustomer)
+    this.documentTypeRepo.register(documentType)
 
-    if (customer) {
-      const accountEnt = new AccountEntity()
-      accountEnt.id = uuid()
-      const accountType = new AccountTypeEntity()
-      accountEnt.accountType = accountType
-      const newAccount = new CreateAccountDto()
-      newAccount.accountTypeId = accountType.id
-      newAccount.customerId = newCustomer.id
+    if (customer === undefined)
+      throw new InternalServerErrorException() // ERRORRRRRRRRRRRRRRRR
 
-      const account = this.accountService.createAccount(newAccount)
+    //Definiendo una Account Type
+    const accountType = new AccountTypeEntity()
+    //Definiendo la nueva Account
+    const accountEnt = new AccountEntity()
+    accountEnt.customer = customer
+    accountEnt.accountType = accountType
+    accountType.name = user.accountTypeName
 
-      if (account) return jwt.sign(user, process.env.TOKEN_SECRET || "tokentest")
-      else throw new InternalServerErrorException()
-    } else throw new InternalServerErrorException()
+    const newAccount = new CreateAccountDto()
+    newAccount.accountType = accountType
+    newAccount.customer = customer
+
+    const account = this.accountService.createAccount(newAccount)
+
+    if (account === undefined) throw new InternalServerErrorException() // ERRORRRRRRRRRRRRRRRR
+    return jwt.sign(user, process.env.TOKEN_SECRET || "tokentest")
   }
 
   /**
@@ -82,6 +92,10 @@ export class SecurityService {
    * @memberof SecurityService
    */
   signOut(JWToken: string): void {
-
+    /**verificar token
+     jwt.verify token
+      si es igual?
+      return deslogueado :) (no hace nada)
+     */
   }
 }

@@ -1,9 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CustomerEntity, CustomerRepository } from 'src/data';
-import { CustomerDto } from 'src/data/dtos';
+import { CustomerDto } from 'src/business/dtos';
 
 @Injectable()
 export class CustomerService {
+
   constructor(private readonly customerRepository: CustomerRepository) { }
 
   /**
@@ -39,7 +40,7 @@ export class CustomerService {
       updatedCustomer.document = customer.document
       updatedCustomer.documentType = customer.documentType
       updatedCustomer.phone = customer.phone
-      
+
       return this.customerRepository.update(id, updatedCustomer)
     } catch (error) {
       throw new InternalServerErrorException(error)
@@ -61,6 +62,14 @@ export class CustomerService {
       return true
     } catch (error) {
       throw new InternalServerErrorException(error)
+    }
+  }
+
+  getAll(): CustomerEntity[] {
+    try {
+      return this.customerRepository.findAll()
+    } catch (error) {
+      throw new Error("Error en getAll" + error)
     }
   }
 }

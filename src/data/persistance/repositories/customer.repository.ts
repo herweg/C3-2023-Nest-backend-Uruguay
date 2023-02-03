@@ -23,9 +23,9 @@ export class CustomerRepository
         ...this.database[indexCurrentEntity],
         ...entity,
         id,
-      } as CustomerEntity;
-    else throw new NotFoundException();
-    return this.database[indexCurrentEntity];
+      } as CustomerEntity
+    else throw new NotFoundException()
+    return this.database[indexCurrentEntity]
   }
 
   delete(id: string, soft?: boolean | undefined): void {
@@ -40,12 +40,12 @@ export class CustomerRepository
   }
 
   findOneById(id: string): CustomerEntity {
-    const currentEntity = this.database.find(
+    const currentEntity = this.database.findIndex(
       (item) => item.id === id
         && typeof item.deletedAt === 'undefined',
     );
-    if (currentEntity) return currentEntity;
-    else throw new NotFoundException();
+    if (currentEntity == -1) throw new NotFoundException()
+    return this.database[currentEntity]
   }
 
   findOneByEmailAndPassword(email: string, password: string): boolean {
@@ -61,31 +61,31 @@ export class CustomerRepository
     documentTypeId: string,
     document: string,
   ): CustomerEntity {
-    const currentEntity = this.database.find(
+    const currentEntity = this.database.findIndex(
       (item) => item.documentType.id === documentTypeId
         && item.document === document
         && typeof item.deletedAt === 'undefined',
     );
-    if (!currentEntity) throw new NotFoundException()
-    else return currentEntity
+    if (currentEntity == -1) throw new NotFoundException()
+    return this.database[currentEntity]
   }
 
   findOneByEmail(email: string): CustomerEntity {
-    const currentEntity = this.database.find(
+    const currentEntity = this.database.findIndex(
       (item) => item.email === email
         && typeof item.deletedAt === 'undefined',
     );
-    if (!currentEntity) throw new NotFoundException()
-    else return currentEntity
+    if (currentEntity == -1) throw new NotFoundException()
+    return this.database[currentEntity]
   }
 
   findOneByPhone(phone: string): CustomerEntity {
-    const currentEntity = this.database.find(
+    const currentEntity = this.database.findIndex(
       (item) => item.phone === phone
         && typeof item.deletedAt === 'undefined',
     );
-    if (!currentEntity) throw new NotFoundException()
-    else return currentEntity
+    if (currentEntity == -1) throw new NotFoundException()
+    return this.database[currentEntity]
   }
 
   findByState(state: boolean): CustomerEntity[] {

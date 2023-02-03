@@ -1,19 +1,26 @@
-import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Delete, Param, Logger } from '@nestjs/common';
 import { AccountService } from 'src/business/services';
 import { AccountEntity, AccountTypeEntity } from 'src/data';
-import { ChangeAccountTypeDto, CreateAccountDto } from 'src/data/dtos';
+import { ChangeAccountTypeDto, CreateAccountDto } from 'src/business/dtos';
+import { TypeDto } from '../../../business/dtos/type.dto';
 
 @Controller('account')
 export class AccountController {
-    constructor(private readonly accountService: AccountService) { }
+    constructor(private readonly accountService: AccountService) {
+    }
 
     @Post("create")
     createAccount(@Body() createAccount: CreateAccountDto): AccountEntity {
         return this.accountService.createAccount(createAccount)
     }
 
-    @Post("getbalance")
-    getBalance(@Body() accountId: string): number {
+    @Post("type/create/")
+    createAccountType(@Body() accountTypeDto: TypeDto): AccountTypeEntity {
+        return this.accountService.createAccountType(accountTypeDto)
+    }
+
+    @Get("getbalance/:id")
+    getBalance(@Param("id") accountId: string): number {
         return this.accountService.getBalance(accountId)
     }
 
@@ -28,22 +35,22 @@ export class AccountController {
     }
 
     @Get("cantransfer")
-    verifyAmountIntoBalance(@Body() accountId: string, amount: number) {
+    verifyAmountIntoBalance(@Body() accountId: string, amount: number): boolean {
         return this.accountService.verifyAmountIntoBalance(accountId, amount)
     }
 
-    @Get("isactive")
-    getState(@Body() accountId: string) {
+    @Get("isactive/:id")
+    getState(@Param("id") accountId: string): boolean {
         return this.accountService.getState(accountId)
     }
 
-    @Patch("changestate")
-    changeState(@Body() accountId: string, state?: boolean) {
+    @Patch("changestate/:id")
+    changeState(@Param("id") accountId: string, state?: boolean) {
         this.accountService.changeState(accountId, state)
     }
 
-    @Get("accounttype")
-    getAccountType(@Body() accountId: string) {
+    @Get("accounttype/:id")
+    getAccountType(@Param("id") accountId: string) {
         this.accountService.getAccountType(accountId)
     }
 
@@ -52,8 +59,14 @@ export class AccountController {
         return this.accountService.changeAccountType(account)
     }
 
-    @Patch("delete")
-    deleteAccount(@Body() accountId: string) {
+    @Delete("delete/:id")
+    deleteAccount(@Param("id") accountId: string) {
         this.accountService.deleteAccount(accountId)
+    }
+
+    // tests
+    @Get("getall")
+    getAll() {
+        return this.accountService.getAll()
     }
 }

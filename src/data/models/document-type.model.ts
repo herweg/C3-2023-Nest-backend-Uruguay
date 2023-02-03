@@ -3,3 +3,11 @@ export interface DocumentTypeModel{
     name: string
     state: boolean
 }
+
+/*
+{
+    "id": "string",
+    "name": "string",
+    "state": "boolean"
+}
+*/
