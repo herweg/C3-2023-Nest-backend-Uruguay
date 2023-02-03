@@ -35,7 +35,7 @@ export class DepositService {
       newDeposit.amount = deposit.amount
       newDeposit.dateTime = Date.now()
       //Add new balance
-      this.accountService.getId(deposit.id).balance += deposit.amount
+      this.accountService.getId(deposit.id).balance = Number(this.accountService.getId(deposit.id).balance) + Number(deposit.amount)
       //Deposit registry
       this.depositRepository.register(newDeposit)
       //Feed the Deposit (observer) to the Observable
@@ -75,6 +75,7 @@ export class DepositService {
     pagination?: PaginationModel,
     dataRange?: DataRangeModel,
   ): DepositEntity[] {
+    
     if (!dataRange?.max || !dataRange.min) throw new Error("Error en getHistory")
     const depositArrayByDate = this.depositRepository.findByDataRange(dataRange?.min, dataRange?.max)
     return depositArrayByDate.filter(id => id.id === depositId)
