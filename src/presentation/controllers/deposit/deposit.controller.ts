@@ -10,9 +10,9 @@ export class DepositController {
 
     @Post("create")
     createDeposit(@Body() newDeposit: DepositDto): DepositEntity {
-        this.depositService.depositObservable.subscribe(obj=>{
-            //subscribe observer
-            this.logger.log(`Deposit created: ${obj.account}`)
+        //subscribe observer
+        this.depositService.depositObservable.subscribe(deposit => {
+            this.logger.log(`Deposit ${deposit.id} created`)
         })
         return this.depositService.createDeposit(newDeposit)
     }
@@ -23,7 +23,7 @@ export class DepositController {
     }
 
     @Get("history/:id")
-    getHistory(@Param("id") depositId: string){
+    getHistory(@Param("id") depositId: string) {
         return this.depositService.getHistory(depositId)
     }
 }
