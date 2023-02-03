@@ -20,13 +20,13 @@ export class TransferController {
     }
 
     @Get('/find-all')
-    getAll(@Body() paginator: PaginationModel): TransferEntity[] {
-        return this.transferService.getAll(paginator)
+    getAll(): TransferEntity[] {
+        return this.transferService.getAll()
     }
 
     @Get("historyout/:id")
     getHistoryOut(@Param("id") accountId: string,
-        @Query("offset", ParseIntPipe) offset?: number, 
+        @Query("offset", ParseIntPipe) offset?: number,
         @Query("limit", ParseIntPipe) limit?: number,
         @Body() dataRange?: DataRangeDto): TransferEntity[] {
         const pagination: PaginationModel = { offset: offset, limit: limit }
@@ -35,7 +35,7 @@ export class TransferController {
 
     @Get("historyin/:id")
     getHistoryIn(@Param("id") accountId: string,
-        @Query("offset", ParseIntPipe) offset?: number, 
+        @Query("offset", ParseIntPipe) offset?: number,
         @Query("limit", ParseIntPipe) limit?: number,
         @Body() dataRange?: DataRangeDto): TransferEntity[] {
         const pagination: PaginationModel = { offset: offset, limit: limit }
@@ -44,7 +44,7 @@ export class TransferController {
 
     @Get("history/:id")
     getHistory(@Param("id") accountId: string,
-        @Query("offset", ParseIntPipe) offset?: number, 
+        @Query("offset", ParseIntPipe) offset?: number,
         @Query("limit", ParseIntPipe) limit?: number,
         @Body() dataRange?: DataRangeDto): TransferEntity[] {
         const pagination: PaginationModel = { offset: offset, limit: limit }
