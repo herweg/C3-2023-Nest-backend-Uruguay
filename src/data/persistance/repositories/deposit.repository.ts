@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { PaginationModel } from "src";
 import { DepositEntity } from "../entities";
 import { BaseRepository } from "./base";
 import { DepositRepositoryInterface } from "./interfaces";
-import { PaginationModel } from '../../../../dist/data/models/pagination.model';
 
 @Injectable()
 export class DepositRepository
@@ -21,7 +21,7 @@ export class DepositRepository
     update(id: string, entity: DepositEntity): DepositEntity {
         const indexCurrentEntity = this.database.findIndex(
             (item) => item.id === id && typeof item.deletedAt === 'undefined',
-        );
+        )
         if (indexCurrentEntity >= 0)
             this.database[indexCurrentEntity] = {
                 ...this.database[indexCurrentEntity],
@@ -43,7 +43,7 @@ export class DepositRepository
 
     private hardDelete(index: number): void {
         if (index > -1) {
-            this.database.splice(index, 1)
+            this.database.splice(index)
         }
     }
 

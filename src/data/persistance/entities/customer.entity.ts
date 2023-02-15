@@ -13,13 +13,3 @@ export class CustomerEntity implements CustomerModel {
     state = true
     deletedAt?: number | Date
 }
-/*
-{
-    "documentType": DocumentTypeModel
-    "document": string
-    "fullName": string
-    "email": string
-    "phone": string
-    "password": string
-}
-*/
