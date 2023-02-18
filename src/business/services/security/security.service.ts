@@ -18,6 +18,7 @@ import { AccountService } from '../account';
 import * as jwt from "jsonwebtoken"
 import { DocumentTypeRepository } from '../../../data/persistance/repositories/document-type.repository';
 import { AccountTypeModel, DocumentTypeModel } from 'src/data/models';
+import { BlobOptions } from 'buffer';
 
 const pasaporte: DocumentTypeModel = {
   id: "c5acd2c2-2c37-4444-a151-9d551fee636f",
@@ -64,7 +65,6 @@ export class SecurityService {
     )
     if (!answer) throw new UnauthorizedException("Email or password doesn't match")
     return jwt.sign(user, process.env.TOKEN_SECRET || "tokentest")
-
   }
 
   /**
@@ -103,7 +103,7 @@ export class SecurityService {
     //Definiendo la nueva Account
     const accountEnt = new AccountEntity()
     accountEnt.customer = customer
-    
+
     switch (user.accountTypeId) {
       case "Caja de ahorros":
         accountEnt.accountType = cajaAhorros
@@ -115,7 +115,7 @@ export class SecurityService {
     }
 
     console.log(accountEnt);
-    
+
     const newAccount = new CreateAccountDto()
     newAccount.accountTypeId = accountEnt.accountType.id
     newAccount.customerId = customer.id
@@ -126,39 +126,6 @@ export class SecurityService {
     return jwt.sign(user, process.env.TOKEN_SECRET || "tokentest")
   }
 
-  //BACKUP signup
-  // signUp(user: SignUpDto): string {
-
-  //   const newCustomer = new CustomerEntity()
-  //   newCustomer.documentType = this.accountService.getDocumentType(user.documentTypeId)
-  //   newCustomer.document = user.document
-  //   newCustomer.fullName = user.fullName
-  //   newCustomer.email = user.email
-  //   newCustomer.phone = user.phone
-  //   newCustomer.password = user.password
-
-  //   //this.documentTypeRepo.register(newCustomer.documentType)
-  //   const customer = this.customerRepository.register(newCustomer)
-
-  //   if (customer === undefined)
-  //     throw new InternalServerErrorException() // ERRORRRRRRRRRRRRRRRR
-
-  //   //Definiendo la nueva Account
-  //   const accountEnt = new AccountEntity()
-  //   accountEnt.customer = customer
-  //   const acctype = this.accountService.getAccountType(user.accountTypeId)
-  //   accountEnt.accountType = acctype
-
-  //   const newAccount = new CreateAccountDto()
-  //   newAccount.accountTypeId = accountEnt.accountType.id
-  //   newAccount.customerId = customer.id
-
-  //   const account = this.accountService.createAccount(newAccount)
-
-  //   if (account === undefined) throw new InternalServerErrorException() // ERRORRRRRRRRRRRRRRRR
-  //   return jwt.sign(user, process.env.TOKEN_SECRET || "tokentest")
-  // }
-
   /**
    * Salir del sistema (Borrar el token (?))
    *
@@ -168,5 +135,20 @@ export class SecurityService {
   signOut(JWToken: string): void {
     if (!jwt.verify(JWToken, process.env.TOKEN_SECRET || 'tokentest')) throw new Error('JWT Not Valid')
     console.log('Signout Completed')
+  }
+
+  fireCheck(email: string): boolean {
+    return this.customerRepository.checkByEmail(email)
+  }
+
+  signInGoogle(email: string): string {
+    const answer = this.customerRepository.checkByEmail(email)
+    if (!answer) throw new UnauthorizedException()
+    const finalUser = this.customerRepository.findOneByEmail(email)
+
+    return jwt.sign(
+      { email: finalUser.email, password: finalUser.password },
+      process.env.TOKEN_SECRET || 'tokentest',
+    );
   }
 }

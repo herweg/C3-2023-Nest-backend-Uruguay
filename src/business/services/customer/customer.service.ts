@@ -34,7 +34,7 @@ export class CustomerService {
   updatedCustomer(id: string, customer: CustomerDto): CustomerEntity {
 
     let newDTEntity = new DocumentTypeEntity()
-    newDTEntity.id = customer.documentTypeId
+    newDTEntity.name = customer.documentTypeId
 
     let updatedCustomer = this.customerRepository.findOneById(id)
     updatedCustomer.documentType = newDTEntity
@@ -71,5 +71,9 @@ export class CustomerService {
     } catch (error) {
       throw new Error("Error en getAll" + error)
     }
+  }
+
+  getOneByEmail(email: string): CustomerEntity {
+    return this.customerRepository.findOneByEmail(email)
   }
 }

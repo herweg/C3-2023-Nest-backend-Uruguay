@@ -79,7 +79,11 @@ export class DepositService {
       ... { min: 0, max: Date.now() },
       ...dataRange,
     }
-    const depositArrayByDate = this.depositRepository.findByDataRange(dataRange?.min, dataRange?.max, pagination)
-    return depositArrayByDate.filter(id => id.id === depositId)
+    const depositArrayByDate = this.depositRepository.findByDataRange(depositId, dataRange.min, dataRange.max, pagination)
+    return depositArrayByDate
+  }
+
+  findAll() {
+    return this.depositRepository.findAll()
   }
 }

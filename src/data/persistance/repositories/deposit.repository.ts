@@ -11,12 +11,13 @@ export class DepositRepository
 
     register(entity: DepositEntity): DepositEntity {
         try {
-            this.database.push(entity)            
+            this.database.push(entity)
             return this.database.at(-1) ?? entity
-        
+
         } catch (error) {
             throw new Error(error)
-        }}
+        }
+    }
 
     update(id: string, entity: DepositEntity): DepositEntity {
         const indexCurrentEntity = this.database.findIndex(
@@ -75,17 +76,19 @@ export class DepositRepository
     }
 
     findByDataRange(
+        accountId: string,
         dateInit: Date | number,
         dateEnd: Date | number,
         paginator?: PaginationModel
     ): DepositEntity[] {
         const currentEntity = this.database.filter(
             (deposit) =>
-                dateInit > deposit.dateTime
+                accountId === deposit.account.id
+                && dateInit < deposit.dateTime
                 && deposit.dateTime < dateEnd
                 && typeof deposit.deletedAt === "undefined"
         )
         if (!currentEntity) throw new NotFoundException()
-        else return currentEntity.slice(Number(paginator?.offset), Number(paginator?.limit))
+        else return currentEntity.slice(Number(paginator?.offset || 0), Number((paginator?.limit || 10) + (paginator?.offset || 0)))
     }
 }

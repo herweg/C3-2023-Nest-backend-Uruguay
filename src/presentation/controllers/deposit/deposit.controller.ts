@@ -27,8 +27,13 @@ export class DepositController {
     getHistory(@Param("id") depositId: string,
         @Query("offset", ParseIntPipe) offset?: number,
         @Query("limit", ParseIntPipe) limit?: number,
-        @Body() dataRange?: DataRangeDto) {
+        @Body() dataRange?: DataRangeDto): DepositEntity[] {
         const pagination: PaginationModel = { offset: offset, limit: limit }
         return this.depositService.getHistory(depositId, pagination, dataRange)
+    }
+
+    @Get("/all")
+    getAll() {
+        return this.depositService.findAll()
     }
 }

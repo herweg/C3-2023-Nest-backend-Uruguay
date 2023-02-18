@@ -12,3 +12,9 @@ export class SignInDto {
     @Min(8)
     password: string;
 }
+
+export class FireSignIn{
+    @IsEmail(undefined, { message: 'Is not a valid email.' })
+    @IsString()
+    email: string;
+}

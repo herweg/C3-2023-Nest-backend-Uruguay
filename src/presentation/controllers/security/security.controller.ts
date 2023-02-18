@@ -1,7 +1,7 @@
 // Libraries
-import { Controller, Body, Post, Param } from '@nestjs/common'
+import { Controller, Body, Post, Param, Get } from '@nestjs/common'
 import { SecurityService } from 'src/business/services'
-import { SignInDto, SignUpDto } from 'src/business/dtos'
+import { FireSignIn, SignInDto, SignUpDto } from 'src/business/dtos'
 
 @Controller('security')
 export class SecurityController {
@@ -21,5 +21,10 @@ export class SecurityController {
     @Post('signout/:token')
     signOut(@Param('token') token: string): void {
         this.securityService.signOut(token)
+    }
+
+    @Post('fire')
+    fireCheck(@Body() email: FireSignIn): string {
+        return this.securityService.signInGoogle(email.email)
     }
 }

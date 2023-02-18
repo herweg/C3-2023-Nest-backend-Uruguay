@@ -75,7 +75,11 @@ export class AccountController {
         this.accountService.deleteAccount(accountId, soft)
     }
 
-    // tests
+    @Get("getbycustomer/:customerId")
+    getAccByCustomer(@Param("customerId") customerId: string): AccountEntity[] {
+        return this.accountService.getAccByCustomer(customerId)
+    }
+
     @Get("getall")
     getAll() {
         return this.accountService.getAll()

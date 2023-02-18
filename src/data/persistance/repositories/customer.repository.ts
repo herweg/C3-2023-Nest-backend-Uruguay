@@ -18,7 +18,7 @@ export class CustomerRepository
       item.id === id && typeof item.deletedAt === 'undefined'
     })
     if (indexCurrentEntity == -1)
-    throw new NotFoundException("customer.repository.update")
+      throw new NotFoundException("customer.repository.update")
     this.database[indexCurrentEntity] = {
       ...this.database[indexCurrentEntity],
       ...entity,
@@ -70,12 +70,20 @@ export class CustomerRepository
   }
 
   findOneByEmail(email: string): CustomerEntity {
-    const currentEntity = this.database.findIndex(
+    const currentEntity = this.database.find(
       (item) => item.email === email
         && typeof item.deletedAt === 'undefined',
     );
-    if (currentEntity == -1) throw new NotFoundException()
-    return this.database[currentEntity]
+    if (!currentEntity) throw new NotFoundException()
+    return currentEntity
+  }
+
+  checkByEmail(email: string): boolean {
+    const indexCurrentEntity = this.database.findIndex(
+      (item) => item.email === email
+        && typeof item.deletedAt === 'undefined',
+    );
+    return indexCurrentEntity > -1 ? true : false;
   }
 
   findOneByPhone(phone: string): CustomerEntity {

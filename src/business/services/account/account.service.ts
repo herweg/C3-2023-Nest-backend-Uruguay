@@ -20,8 +20,11 @@ export class AccountService {
 
 
   getId(id: string): AccountEntity {
-    const account = this.accountRepository.findOneById(id)
-    return account
+    return this.accountRepository.findOneById(id)
+  }
+
+  getAccByCustomer(customerId: string): AccountEntity[] {
+    return this.accountRepository.findByCustomer(customerId)
   }
   /**
    * Crear una cuenta
